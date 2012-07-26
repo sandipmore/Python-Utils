@@ -4,6 +4,8 @@ from pymongo import Connection
 import sys
 import os
 import string
+import re
+
 def storeInMongo(smsdata, obj, fieldTypeMap):
     try:
 	for k in obj:
@@ -15,7 +17,11 @@ def storeInMongo(smsdata, obj, fieldTypeMap):
 		except:
 		    pass
 	    if fieldTypeMap.has_key(k) and fieldTypeMap[k] == 'int':
-	        obj[k] = int(obj[k])
+	        try:
+		    obj[k] = int(obj[k])
+		except:
+		    num = obj[k]
+		    obj[k] = re.sub("[^0-9]*", "", num)
 	print "insert object"
 	objectId = smsdata.insert(obj)
     except:
@@ -25,7 +31,8 @@ def readFile():
    filename = sys.argv[1]
    keys = []
    fieldTypes = []
-   
+   if len(sys.argv) < 2:
+       print "correct command datafile.csv fieldsTxtFile fieldTypeTxtFile"   
    if len(sys.argv) > 2:
        fieldFile = sys.argv[2]
        if not os.path.exists(fieldFile):
@@ -61,7 +68,6 @@ def readFile():
    for line in fp:
        try:
            rawValues = line.split(",")
-	       
 	   if len(rawValues) not in [len(keys), len(keys) -1]: 
 		#print "less number of columns, skipping ", len(rawValues), len(keys)
 		continue
