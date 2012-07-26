@@ -14,6 +14,8 @@ def storeInMongo(smsdata, obj, fieldTypeMap):
 		    obj[k]= datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
 		except:
 		    pass
+	    if fieldTypeMap.has_key(k) and fieldTypeMap[k] == 'int':
+	        obj[k] = int(obj[k])
 	print "insert object"
 	objectId = smsdata.insert(obj)
     except:
